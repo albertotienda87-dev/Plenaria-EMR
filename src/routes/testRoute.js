@@ -1,18 +1,20 @@
-import express from "express";
-import db from "../../firebase.js"; // go up twice: routes → src → root
+import { Router } from "express";
+import admin from "../firebase.js";
 
-const router = express.Router();
+const router = Router();
 
-router.get("/test-firestore", async (req, res) => {
+// Test Firebase connection
+router.get("/firebase-test", async (req, res) => {
   try {
-    const docRef = db.collection("tests").doc("ping");
-    await docRef.set({ time: new Date().toISOString() });
+    const db = admin.firestore();
+    const docRef = db.collection("test").doc("hello");
+    await docRef.set({ message: "Firebase is connected 🎉", time: new Date() });
 
-    const snapshot = await docRef.get();
-    res.json({ id: snapshot.id, ...snapshot.data() });
+    const doc = await docRef.get();
+    return res.json({ success: true, data: doc.data() });
   } catch (err) {
-    console.error("Firestore error:", err);
-    res.status(500).json({ error: err.message });
+    console.error("Firebase test error:", err);
+    return res.status(500).json({ error: "Firebase connection failed" });
   }
 });
 

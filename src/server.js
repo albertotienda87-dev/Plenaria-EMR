@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import patientsRouter from "./routes/patients.routes.js";
-import testRoute from "./routes/testRoute.js";  // ⬅️ 1) Import our new test route
+import testRoute from "./routes/testRoute.js";  // 
 
 const app = express();
 
@@ -16,8 +16,7 @@ app.get("/health", (req, res) => res.status(200).json({ status: "ok" }));
 app.use("/api", patientsRouter);
 
 // 4) Mount Firestore test route
-//    Visiting /test-firestore will trigger our Firestore check
-app.use("/", testRoute);
+app.use("/api", testRouter);
 
 // 5) 404 handler
 app.use((req, res) => {
