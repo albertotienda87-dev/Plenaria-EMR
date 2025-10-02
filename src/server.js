@@ -1,33 +1,36 @@
 import express from "express";
 import cors from "cors";
 import patientsRouter from "./routes/patients.routes.js";
+import testRoute from "./routes/testRoute.js";  // ⬅️ 1) Import our new test route
 
 const app = express();
 
-// 1) Middlewares globales (se aplican a TODAS las rutas)
-app.use(cors());          // Permite que el frontend (otro origen/puerto) haga requests
-app.use(express.json());  // Parsea JSON automáticamente en req.body
+// 1) Global Middlewares
+app.use(cors());
+app.use(express.json());
 
-// 2) Healthcheck de vida
+// 2) Healthcheck
 app.get("/health", (req, res) => res.status(200).json({ status: "ok" }));
 
-// 3) Montas las rutas de pacientes bajo el prefijo /api
-//    Significa que las rutas del router se vuelven: /api/patients, /api/patients/:id, etc.
+// 3) Mount patients routes under /api
 app.use("/api", patientsRouter);
 
-// 4) 404 para cualquier ruta no encontrada
+// 4) Mount Firestore test route
+//    Visiting /test-firestore will trigger our Firestore check
+app.use("/", testRoute);
+
+// 5) 404 handler
 app.use((req, res) => {
   return res.status(404).json({ error: "Not found" });
 });
 
-// 5) Manejador de errores (si algún controller lanza un error)
-//    Tener este bloque al final es una buena práctica.
+// 6) Global error handler
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err);
   return res.status(500).json({ error: "Internal Server Error" });
 });
 
-// 6) Arranque del servidor
+// 7) Server start
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
